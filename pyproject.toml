@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hiktemp"
+version = "0.1.0"
+description = "Minimal radiometric temperature extraction from Hikvision thermal cameras"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = ["requests>=2.28", "numpy>=1.23"]
+
+[project.optional-dependencies]
+dev = ["pytest", "matplotlib", "pillow"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["hiktemp*"]
