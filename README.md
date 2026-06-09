@@ -50,11 +50,13 @@ plt.imshow(frame.matrix, cmap="inferno")
 plt.colorbar(label="°C")
 plt.show()
 
-# with band mask
+# with band mask — color from temperature, transparency from mask
 import numpy as np
 import matplotlib.pyplot as plt
 
-rgba = plt.get_cmap("inferno")(frame.alpha(lo=28, hi=29))
+norm = (frame.matrix - frame.matrix.min()) / (frame.matrix.max() - frame.matrix.min())
+rgba = plt.get_cmap("inferno")(norm)       # color mapped from temperature
+rgba[:, :, 3] = frame.alpha(lo=28, hi=29)  # alpha from band mask
 plt.imshow(rgba)
 plt.show()
 ```
