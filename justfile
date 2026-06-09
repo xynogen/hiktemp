@@ -16,7 +16,7 @@ install:
 
 # ── test ───────────────────────────────────────────────────────────────────────
 
-# Test operations (unit|lint|tidy)
+# Test operations (unit|tidy)
 [group('test')]
 test action:
     #!/usr/bin/env bash
@@ -25,21 +25,18 @@ test action:
       unit)
         venv/bin/python -m pytest tests/ -v
         ;;
-      lint)
-        venv/bin/ruff check hiktemp/ tests/
-        ;;
       tidy)
         find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
         rm -rf .pytest_cache dist build hiktemp.egg-info
         ;;
       *)
         echo "Unknown action: {{action}}"
-        echo "Usage: just test <unit|lint|tidy>"
+        echo "Usage: just test <unit|tidy>"
         exit 1
         ;;
     esac
 
-# Format operations (check|fix)
+# Format and lint operations (check|fix|lint)
 [group('format')]
 format action="fix":
     #!/usr/bin/env bash
@@ -53,9 +50,12 @@ format action="fix":
         venv/bin/ruff format --check hiktemp/ tests/
         venv/bin/ruff check hiktemp/ tests/
         ;;
+      lint)
+        venv/bin/ruff check hiktemp/ tests/
+        ;;
       *)
         echo "Unknown action: {{action}}"
-        echo "Usage: just format <fix|check>"
+        echo "Usage: just format <fix|check|lint>"
         exit 1
         ;;
     esac
