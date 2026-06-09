@@ -17,7 +17,7 @@ from hiktemp._frame import ThermalFrame
 
 # ── fixtures ──────────────────────────────────────────────────────────────────
 
-RAW = os.path.join(os.path.dirname(__file__), "..", "debug_multipart.raw")
+RAW = os.path.join(os.path.dirname(__file__), "debug_multipart.raw")
 assert os.path.exists(RAW), f"test fixture missing: {RAW}"
 
 @pytest.fixture
