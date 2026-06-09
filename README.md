@@ -59,7 +59,7 @@ plt.imshow(rgba)
 plt.show()
 ```
 
-Reuse session for continuous polling:
+Reuse session for continuous polling — once authenticated, no need to pass credentials again:
 
 ```python
 import requests
