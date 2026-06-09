@@ -13,6 +13,13 @@ default:
 install:
     python3 -m venv venv
     venv/bin/pip install -e ".[dev]"
+    venv/bin/pip install build twine
+
+# Build wheel + sdist, then upload to PyPI
+[group('env')]
+publish:
+    venv/bin/python -m build
+    venv/bin/twine upload dist/*
 
 # ── test ───────────────────────────────────────────────────────────────────────
 
