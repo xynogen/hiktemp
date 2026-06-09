@@ -26,7 +26,7 @@ test action:
         venv/bin/python -m pytest tests/ -v
         ;;
       lint)
-        venv/bin/python -m ruff check hiktemp/ tests/
+        venv/bin/ruff check hiktemp/ tests/
         ;;
       tidy)
         find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
@@ -35,6 +35,27 @@ test action:
       *)
         echo "Unknown action: {{action}}"
         echo "Usage: just test <unit|lint|tidy>"
+        exit 1
+        ;;
+    esac
+
+# Format operations (check|fix)
+[group('format')]
+format action="fix":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    case "{{action}}" in
+      fix)
+        venv/bin/ruff format hiktemp/ tests/
+        venv/bin/ruff check --fix hiktemp/ tests/
+        ;;
+      check)
+        venv/bin/ruff format --check hiktemp/ tests/
+        venv/bin/ruff check hiktemp/ tests/
+        ;;
+      *)
+        echo "Unknown action: {{action}}"
+        echo "Usage: just format <fix|check>"
         exit 1
         ;;
     esac

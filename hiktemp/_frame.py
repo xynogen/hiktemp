@@ -13,22 +13,26 @@ import numpy as np
 
 # ── colormap (pure numpy, no matplotlib) ─────────────────────────────────────
 
+
 def _inferno_lut() -> np.ndarray:
     """256×3 uint8 inferno colormap, interpolated from reference knots."""
-    knots = np.array([
-        [0.001462, 0.000466, 0.013866],
-        [0.087411, 0.044556, 0.224813],
-        [0.258234, 0.038571, 0.406485],
-        [0.416331, 0.090203, 0.432943],
-        [0.578304, 0.148039, 0.404411],
-        [0.735683, 0.215906, 0.330245],
-        [0.865006, 0.316822, 0.226055],
-        [0.961293, 0.460947, 0.106217],
-        [0.994738, 0.624750, 0.039886],
-        [0.967972, 0.796225, 0.156918],
-        [0.988362, 0.998364, 0.644924],
-    ], dtype=np.float32)
-    xs  = np.linspace(0, 1, len(knots))
+    knots = np.array(
+        [
+            [0.001462, 0.000466, 0.013866],
+            [0.087411, 0.044556, 0.224813],
+            [0.258234, 0.038571, 0.406485],
+            [0.416331, 0.090203, 0.432943],
+            [0.578304, 0.148039, 0.404411],
+            [0.735683, 0.215906, 0.330245],
+            [0.865006, 0.316822, 0.226055],
+            [0.961293, 0.460947, 0.106217],
+            [0.994738, 0.624750, 0.039886],
+            [0.967972, 0.796225, 0.156918],
+            [0.988362, 0.998364, 0.644924],
+        ],
+        dtype=np.float32,
+    )
+    xs = np.linspace(0, 1, len(knots))
     out = np.linspace(0, 1, 256)
     lut = np.stack([np.interp(out, xs, knots[:, c]) for c in range(3)], axis=1)
     return (lut * 255).astype(np.uint8)
@@ -52,7 +56,7 @@ def _band_alpha(
     Fade zone is *outside* the band: full-on inside, fades to 0 outside.
     Pure polynomial — no exp, no overflow.
     """
-    fade = max((hi - lo) * 0.05, 0.1)   # 5 % of band width, min 0.1 °C
+    fade = max((hi - lo) * 0.05, 0.1)  # 5 % of band width, min 0.1 °C
 
     def _quintic(t: np.ndarray) -> np.ndarray:
         t = np.clip(t, 0.0, 1.0)
@@ -64,6 +68,7 @@ def _band_alpha(
 
 
 # ── ThermalFrame ─────────────────────────────────────────────────────────────
+
 
 class ThermalFrame:
     """
@@ -89,8 +94,8 @@ class ThermalFrame:
         meta: dict,
     ) -> None:
         self.matrix = matrix
-        self.jpeg   = jpeg
-        self.meta   = meta
+        self.jpeg = jpeg
+        self.meta = meta
 
     # ── stats ─────────────────────────────────────────────────────────────────
 
@@ -177,12 +182,12 @@ class ThermalFrame:
         (H, W, 3) uint8 BGR — drop-in for cv2.imshow().
         vmin/vmax default to matrix min/max.
         """
-        lut  = _LUT_INFERNO
-        lo   = vmin if vmin is not None else self.min
-        hi   = vmax if vmax is not None else self.max
+        lut = _LUT_INFERNO
+        lo = vmin if vmin is not None else self.min
+        hi = vmax if vmax is not None else self.max
         norm = (self.matrix - lo) / max(hi - lo, 1e-6)
-        rgb  = _apply_lut(norm, lut)
-        return rgb[:, :, ::-1].copy()   # RGB → BGR
+        rgb = _apply_lut(norm, lut)
+        return rgb[:, :, ::-1].copy()  # RGB → BGR
 
     def to_rgba(
         self,
@@ -197,19 +202,16 @@ class ThermalFrame:
         lo, hi : temperature band for the alpha mask.
         vmin, vmax : colormap normalisation range (default = lo, hi).
         """
-        lut   = _LUT_INFERNO
+        lut = _LUT_INFERNO
         _vmin = vmin if vmin is not None else lo
         _vmax = vmax if vmax is not None else hi
-        norm  = (self.matrix - _vmin) / max(_vmax - _vmin, 1e-6)
-        rgb   = _apply_lut(norm, lut)
-        a     = (self.alpha(lo, hi) * 255).astype(np.uint8)
+        norm = (self.matrix - _vmin) / max(_vmax - _vmin, 1e-6)
+        rgb = _apply_lut(norm, lut)
+        a = (self.alpha(lo, hi) * 255).astype(np.uint8)
         return np.dstack([rgb, a])
 
     # ── dunder ────────────────────────────────────────────────────────────────
 
     def __repr__(self) -> str:
         H, W = self.matrix.shape
-        return (
-            f"<ThermalFrame {W}×{H} "
-            f"min={self.min:.2f} max={self.max:.2f} °C>"
-        )
+        return f"<ThermalFrame {W}×{H} min={self.min:.2f} max={self.max:.2f} °C>"

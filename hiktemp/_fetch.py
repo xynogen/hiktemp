@@ -20,7 +20,7 @@ _BOUNDARY = b"--boundary"
 def _body(part: bytes) -> bytes:
     """Strip multipart headers, return body bytes."""
     i = part.find(b"\r\n\r\n")
-    return part[i + 4:]
+    return part[i + 4 :]
 
 
 def fetch(
@@ -59,13 +59,13 @@ def fetch(
         if own_session:
             session.close()
 
-    raw   = resp.content
+    raw = resp.content
     parts = raw.split(_BOUNDARY)
 
     # Part 1 — JSON metadata
     meta_body = _body(parts[1])
     meta_body = meta_body[: meta_body.find(b"--")]
-    meta      = json.loads(meta_body)["JpegPictureWithAppendData"]
+    meta = json.loads(meta_body)["JpegPictureWithAppendData"]
 
     W: int = meta["jpegPicWidth"]
     H: int = meta["jpegPicHeight"]
@@ -75,7 +75,7 @@ def fetch(
     jpeg = jpeg[: jpeg.find(_BOUNDARY)]
 
     # Part 3 — float32 temperature blob
-    blob   = _body(parts[3])[: W * H * 4]
+    blob = _body(parts[3])[: W * H * 4]
     matrix = np.frombuffer(blob, dtype="<f4").reshape(H, W).copy()
 
     return meta, jpeg, matrix

@@ -24,7 +24,7 @@ from ._fetch import fetch
 from ._frame import ThermalFrame
 
 __version__ = "0.1.0"
-__all__     = ["hiktemp", "ThermalFrame"]
+__all__ = ["hiktemp", "ThermalFrame"]
 
 
 def hiktemp(
@@ -69,7 +69,11 @@ def hiktemp(
         ``.to_rgba(lo, hi)``     — (H,W,4) uint8, with band alpha applied
     """
     meta, jpeg, matrix = fetch(
-        url, username, password,
-        channel=channel, timeout=timeout, session=session,
+        url,
+        username,
+        password,
+        channel=channel,
+        timeout=timeout,
+        session=session,
     )
     return ThermalFrame(matrix, jpeg, meta)
