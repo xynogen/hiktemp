@@ -28,8 +28,8 @@ __all__ = ["hiktemp", "ThermalFrame"]
 
 def hiktemp(
     url: str,
-    username: str,
-    password: str,
+    username: str | None = None,
+    password: str | None = None,
     *,
     channel: int = 1,
     timeout: float = 10.0,
@@ -42,16 +42,17 @@ def hiktemp(
     ----------
     url : str
         Base URL of the camera, e.g. ``"http://192.168.1.1"``.
-    username : str
-        Digest-auth username.
-    password : str
-        Digest-auth password.
+    username : str, optional
+        Digest-auth username. Required when session is not provided.
+    password : str, optional
+        Digest-auth password. Required when session is not provided.
     channel : int
         ISAPI thermal channel, default 1.
     timeout : float
         HTTP request timeout in seconds.
     session : requests.Session, optional
-        Reuse an existing session (avoids repeated digest handshakes).
+        Reuse an existing pre-authenticated session.
+        When provided, username and password are not needed.
 
     Returns
     -------

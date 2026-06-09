@@ -25,8 +25,8 @@ def _body(part: bytes) -> bytes:
 
 def fetch(
     url: str,
-    username: str,
-    password: str,
+    username: str | None = None,
+    password: str | None = None,
     channel: int = 1,
     timeout: float = 10.0,
     session: requests.Session | None = None,
@@ -45,6 +45,10 @@ def fetch(
     """
     own_session = session is None
     if own_session:
+        if not username or not password:
+            raise ValueError(
+                "username and password are required when session is not provided"
+            )
         session = requests.Session()
         session.auth = HTTPDigestAuth(username, password)
 

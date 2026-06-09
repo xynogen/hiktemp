@@ -69,7 +69,7 @@ session = requests.Session()
 session.auth = HTTPDigestAuth("admin", "password")
 
 while True:
-    frame = hiktemp("http://192.168.1.1", "admin", "password", session=session)
+    frame = hiktemp("http://192.168.1.1", session=session)
     print(frame.hotspot())
 ```
 
