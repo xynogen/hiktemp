@@ -22,7 +22,7 @@ import requests
 from ._fetch import fetch
 from ._frame import ThermalFrame
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __all__ = ["hiktemp", "ThermalFrame"]
 
 
