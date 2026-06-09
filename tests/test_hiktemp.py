@@ -130,7 +130,6 @@ def test_coldspot_in_band(frame_banded):
     assert 28.0 - 0.1 <= frame_banded.matrix[r, c] <= 29.0 + 0.1
 
 
-
 # ── hiktemp() integration (mocked HTTP) ──────────────────────────────────────
 
 
