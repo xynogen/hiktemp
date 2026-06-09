@@ -12,7 +12,7 @@ pip install hiktemp
 Or from source:
 
 ```bash
-git clone https://github.com/yourname/hiktemp
+git clone https://github.com/xynogen/hiktemp
 cd hiktemp
 pip install -e .
 ```
@@ -22,7 +22,6 @@ pip install -e .
 ```python
 from hiktemp import hiktemp
 
-# pull one frame
 frame = hiktemp("http://192.168.1.1", "admin", "password")
 
 frame.matrix          # np.ndarray (H, W) float32 — per-pixel °C
@@ -34,16 +33,35 @@ frame.mean            # float — global mean °C
 frame.std             # float — global std °C
 frame.hotspot()       # (row, col) — global hotspot
 frame.coldspot()      # (row, col) — global coldspot
-frame.to_bgr()        # np.ndarray (H,W,3) uint8 — cv2.imshow() ready
 
 # band filter — lo/hi passed at call time
-frame.hotspot(lo=28, hi=29)       # hotspot within band
-frame.coldspot(lo=28, hi=29)      # coldspot within band
-frame.masked(lo=28, hi=29)        # matrix, out-of-band pixels = NaN
-frame.alpha(lo=28, hi=29)         # float32 (H,W) quintic smoothstep mask
-frame.to_rgba(lo=28, hi=29)       # (H,W,4) uint8 with alpha mask applied
+frame.hotspot(lo=28, hi=29)    # hotspot within band
+frame.coldspot(lo=28, hi=29)   # coldspot within band
+frame.masked(lo=28, hi=29)     # matrix with out-of-band pixels = NaN
+frame.alpha(lo=28, hi=29)      # float32 (H,W) quintic smoothstep mask 0–1
+```
 
-# reuse session for continuous polling
+Visualization is left to the caller:
+
+```python
+import matplotlib.pyplot as plt
+
+plt.imshow(frame.matrix, cmap="inferno")
+plt.colorbar(label="°C")
+plt.show()
+
+# with band mask
+import numpy as np
+import matplotlib.pyplot as plt
+
+rgba = plt.get_cmap("inferno")(frame.alpha(lo=28, hi=29))
+plt.imshow(rgba)
+plt.show()
+```
+
+Reuse session for continuous polling:
+
+```python
 import requests
 from requests.auth import HTTPDigestAuth
 
@@ -52,8 +70,7 @@ session.auth = HTTPDigestAuth("admin", "password")
 
 while True:
     frame = hiktemp("http://192.168.1.1", "admin", "password", session=session)
-    bgr   = frame.to_bgr()
-    # cv2.imshow("thermal", bgr)
+    print(frame.hotspot())
 ```
 
 ## Requirements
@@ -61,8 +78,6 @@ while True:
 - Python >= 3.10
 - `requests >= 2.28`
 - `numpy >= 1.23`
-
-opencv-python is **optional** — `to_bgr()` and `to_rgba()` return plain numpy arrays.
 
 ## Tested on
 
