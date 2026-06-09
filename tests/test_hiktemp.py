@@ -130,25 +130,6 @@ def test_coldspot_in_band(frame_banded):
     assert 28.0 - 0.1 <= frame_banded.matrix[r, c] <= 29.0 + 0.1
 
 
-# ── opencv-compat output ──────────────────────────────────────────────────────
-
-
-def test_to_bgr_shape(frame):
-    bgr = frame.to_bgr()
-    assert bgr.shape == (288, 384, 3)
-    assert bgr.dtype == np.uint8
-
-
-def test_to_rgba_shape(frame):
-    rgba = frame.to_rgba(lo=27.0, hi=35.0)
-    assert rgba.shape == (288, 384, 4)
-    assert rgba.dtype == np.uint8
-
-
-def test_to_rgba_alpha_banded(frame_banded):
-    rgba = frame_banded.to_rgba(lo=28.0, hi=29.0)
-    assert rgba[:, :, 3].min() < 255
-
 
 # ── hiktemp() integration (mocked HTTP) ──────────────────────────────────────
 
