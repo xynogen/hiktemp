@@ -13,18 +13,19 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v6
+      - uses: astral-sh/setup-uv@v6
         with:
-          python-version: "3.11"
+          enable-cache: true
 
-      - name: Install dependencies
-        run: pip install -e ".[dev]"
+      - name: Lint & format
+        run: |
+          uv run --with ruff -- ruff check hiktemp/ tests/
+          uv run --with ruff -- ruff format --check hiktemp/ tests/
 
-      - name: Lint
-        run: ruff check hiktemp/ tests/
-
-      - name: Format check
-        run: ruff format --check hiktemp/ tests/
-
-      - name: Test
-        run: pytest tests/ -v
+      - name: Test on Python 3.10 - 3.13
+        run: |
+          for ver in 3.10 3.11 3.12 3.13; do
+            echo "::group::Python $ver"
+            uv run --extra dev --python "$ver" -- pytest tests/ -q
+            echo "::endgroup::"
+          done

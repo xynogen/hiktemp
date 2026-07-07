@@ -8,18 +8,16 @@ default:
 
 # ── env ────────────────────────────────────────────────────────────────────────
 
-# Create venv and install all dependencies (including dev extras)
+# Install all dependencies via uv
 [group('env')]
 install:
-    python3 -m venv venv
-    venv/bin/pip install -e ".[dev]"
-    venv/bin/pip install build twine
+    uv sync --extra dev
 
 # Build wheel + sdist, then upload to PyPI
 [group('env')]
 publish:
-    venv/bin/python -m build
-    venv/bin/twine upload dist/*
+    uv build
+    uv run --with twine -- twine upload dist/*
 
 # ── test ───────────────────────────────────────────────────────────────────────
 
@@ -30,7 +28,7 @@ test action:
     set -euo pipefail
     case "{{action}}" in
       unit)
-        venv/bin/python -m pytest tests/ -v
+        uv run --extra dev -- pytest tests/ -v
         ;;
       tidy)
         find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
@@ -50,12 +48,12 @@ format action="fix":
     set -euo pipefail
     case "{{action}}" in
       fix)
-        venv/bin/ruff format hiktemp/ tests/
-        venv/bin/ruff check --fix hiktemp/ tests/
+        uv run --with ruff -- ruff format hiktemp/ tests/
+        uv run --with ruff -- ruff check --fix hiktemp/ tests/
         ;;
       check)
-        venv/bin/ruff format --check hiktemp/ tests/
-        venv/bin/ruff check hiktemp/ tests/
+        uv run --with ruff -- ruff format --check hiktemp/ tests/
+        uv run --with ruff -- ruff check hiktemp/ tests/
         ;;
       *)
         echo "Unknown action: {{action}}"
@@ -71,10 +69,10 @@ lint action="check":
     set -euo pipefail
     case "{{action}}" in
       check)
-        venv/bin/ruff check hiktemp/ tests/
+        uv run --with ruff -- ruff check hiktemp/ tests/
         ;;
       fix)
-        venv/bin/ruff check --fix hiktemp/ tests/
+        uv run --with ruff -- ruff check --fix hiktemp/ tests/
         ;;
       *)
         echo "Unknown action: {{action}}"

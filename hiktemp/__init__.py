@@ -17,13 +17,15 @@ Visualization (colormap, bgr, rgba) is left to the caller via matplotlib/cv2.
 
 from __future__ import annotations
 
+from importlib.metadata import version
+
 import requests
 
 from ._fetch import fetch
 from ._frame import ThermalFrame
 
-__version__ = "0.1.1"
-__all__ = ["hiktemp", "ThermalFrame"]
+__version__ = version("hiktemp")
+__all__ = ["ThermalFrame", "hiktemp"]
 
 
 def hiktemp(
@@ -34,6 +36,7 @@ def hiktemp(
     channel: int = 1,
     timeout: float = 10.0,
     session: requests.Session | None = None,
+    retries: int | None = None,
 ) -> ThermalFrame:
     """
     Pull one radiometric frame from a Hikvision thermal camera.
@@ -53,6 +56,10 @@ def hiktemp(
     session : requests.Session, optional
         Reuse an existing pre-authenticated session.
         When provided, username and password are not needed.
+    retries : int, optional
+        Number of retries on transient errors (HTTP 500/502/503/504 and
+        connection failures).  Default ``None`` uses a built-in policy
+        (3 retries, exponential back-off).  Set to ``0`` to disable.
 
     Returns
     -------
@@ -73,5 +80,6 @@ def hiktemp(
         channel=channel,
         timeout=timeout,
         session=session,
+        retries=retries,
     )
     return ThermalFrame(matrix, jpeg, meta)
