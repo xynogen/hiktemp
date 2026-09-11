@@ -11,6 +11,8 @@ permissions: {}
 jobs:
   ci:
     uses: ./.github/workflows/ci.yml
+    with:
+      full: true
 
   publish:
     needs: ci
@@ -20,12 +22,8 @@ jobs:
       id-token: write
 
     steps:
-      - uses: actions/checkout@v5
-
-      - uses: astral-sh/setup-uv@v6
-
-      - name: Build
-        run: uv build
-
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: python-package-distributions
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@fb13cb306901256ace3dab689990e13a5550ffaa # v1.11.0

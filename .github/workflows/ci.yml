@@ -2,30 +2,68 @@ name: CI
 
 on:
   workflow_call:
+    inputs:
+      full:
+        description: Test the full Python matrix (3.10-3.13) instead of just latest
+        type: boolean
+        default: false
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
-jobs:
-  check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
+permissions: {}
 
-      - uses: astral-sh/setup-uv@v6
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@f226477cf6208c3824ce69a8a4b0255039591272 # v6.3
         with:
           enable-cache: true
+      - run: uv run --extra dev -- ruff check hiktemp/ tests/
+      - run: uv run --extra dev -- ruff format --check hiktemp/ tests/
 
-      - name: Lint & format
-        run: |
-          uv run --with ruff -- ruff check hiktemp/ tests/
-          uv run --with ruff -- ruff format --check hiktemp/ tests/
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ${{ inputs.full && fromJSON('["3.10", "3.11", "3.12", "3.13"]') || fromJSON('["3.13"]') }}
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@f226477cf6208c3824ce69a8a4b0255039591272 # v6.3
+        with:
+          enable-cache: true
+      - run: uv run --extra dev --python "${{ matrix.python }}" -- pytest tests/ -q
 
-      - name: Test on Python 3.10 - 3.13
-        run: |
-          for ver in 3.10 3.11 3.12 3.13; do
-            echo "::group::Python $ver"
-            uv run --extra dev --python "$ver" -- pytest tests/ -q
-            echo "::endgroup::"
-          done
+  package:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@f226477cf6208c3824ce69a8a4b0255039591272 # v6.3
+        with:
+          enable-cache: true
+      - run: uv build
+      - run: uv run --with twine -- twine check dist/*
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: python-package-distributions
+          path: dist/
