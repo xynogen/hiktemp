@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: astral-sh/setup-uv@f226477cf6208c3824ce69a8a4b0255039591272 # v6.3
+      - uses: astral-sh/setup-uv@bd01e18f51369d5a26f1651c3cb451d3417e3bba # v6.3
         with:
           enable-cache: true
       - run: uv run --extra dev -- ruff check hiktemp/ tests/
@@ -45,7 +45,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: astral-sh/setup-uv@f226477cf6208c3824ce69a8a4b0255039591272 # v6.3
+      - uses: astral-sh/setup-uv@bd01e18f51369d5a26f1651c3cb451d3417e3bba # v6.3
         with:
           enable-cache: true
       - run: uv run --extra dev --python "${{ matrix.python }}" -- pytest tests/ -q
@@ -58,7 +58,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: astral-sh/setup-uv@f226477cf6208c3824ce69a8a4b0255039591272 # v6.3
+      - uses: astral-sh/setup-uv@bd01e18f51369d5a26f1651c3cb451d3417e3bba # v6.3
         with:
           enable-cache: true
       - run: uv build
